@@ -1,45 +1,39 @@
-import importlib
-import os
+name: Daily Podcast Automation
 
-# Import Google Cloud Text-to-Speech safely
-pkg_name = "google" + "." + "cloud" + "." + "texttospeech"
-texttospeech = importlib.import_module(pkg_name)
+on:
+  schedule:
+    - cron: '30 9 * * *' # Runs every day at 4:30 AM CST (09:30 UTC)
+  workflow_dispatch:      # Allows manual test runs anytime
 
-def render_google_tts(script_text, output_mp3="today_episode.mp3"):
-    api_key = os.environ.get("GCP_TTS_API_KEY")
-    if not api_key:
-        raise ValueError("GCP_TTS_API_KEY environment variable is missing.")
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    client = texttospeech.TextToSpeechClient(
-        client_options={"api_key": api_key}
-    )
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    # Solo Female Host Voice (Google Journey Premium Voice)
-    voice = texttospeech.VoiceSelectionParams(
-        language_code="en-US",
-        name="en-US-Journey-F"
-    )
+      - name: Install Dependencies
+        run: |
+          pip install google-cloud-texttospeech boto3
 
-    audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3,
-        speaking_rate=1.0
-    )
+      - name: Generate Audio & Update RSS
+        env:
+          GCP_TTS_API_KEY: ${{ secrets.GCP_TTS_API_KEY }}
+          CLOUDFLARE_R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_R2_ACCOUNT_ID }}
+          CLOUDFLARE_R2_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY }}
+          CLOUDFLARE_R2_SECRET_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_KEY }}
+          PODCAST_DOMAIN: ${{ secrets.PODCAST_DOMAIN }}
+        run: |
+          python scripts/[suspicious link removed]
 
-    # Split long text into natural paragraph chunks
-    paragraphs = [p.strip() for p in script_text.split("\n\n") if p.strip()]
-    
-    with open(output_mp3, "wb") as out:
-        for para in paragraphs:
-            synthesis_input = texttospeech.SynthesisInput(text=para)
-            response = client.synthesize_speech(
-                input=synthesis_input, 
-                voice=voice, 
-                audio_config=audio_config
-            )
-            out.write([suspicious link removed]_content)
-
-    print(f"Successfully generated 15-minute solo female episode: {output_mp3}")
-    return output_mp3
-
-if __name__ == "__main__":
-    print("Pipeline ready. Starting daily synthesis...")
+      - name: Deploy RSS to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name=daily-news-podcast
