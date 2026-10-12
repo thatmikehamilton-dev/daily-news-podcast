@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install google-cloud-texttospeech boto3
+          python scripts/generate_audio.py
 
       - name: Generate Audio & Update RSS
         env:
