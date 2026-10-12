@@ -1,62 +1,28 @@
-import os
-import sys
-import json
-import base64
-import urllib.request
+name: Daily Podcast Automation
 
-def main():
-    api_key = os.environ.get("GCP_TTS_API_KEY")
-    if not api_key:
-        print("Error: GCP_TTS_API_KEY environment variable is not set.")
-        sys.exit(1)
+on:
+  schedule:
+    - cron: '30 9 * * *'
+  workflow_dispatch:
 
-    os.makedirs("public", exist_ok=True)
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    news_text = """Welcome to today's Daily News Briefing. 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-In economic news, two American economists, Robert E. Hall and Michael Woodford, have been awarded the Nobel Memorial Prize in Economic Sciences for transforming our understanding of how business expectations and interest rates influence financial stability.
+      - name: Install Dependencies
+        run: |
+          pip install google-cloud-texttospeech boto3
 
-In entertainment, filmmaker Quentin Tarantino is making his stage writing debut in London's West End with a comedic play titled The Popinjay Cavalier, starring Sacha Baron Cohen. 
-
-Meanwhile at the weekend box office, the horror feature Other Mommy claimed the top spot globally despite mixed reviews.
-
-Thank you for listening to today's briefing."""
-
-    # Construct request URL
-    host = "[suspicious link removed]"
-    endpoint = f"https://{host}/v1/text:synthesize?key={api_key}"
-    
-    payload = {
-        "input": {"text": news_text},
-        "voice": {
-            "languageCode": "en-US",
-            "name": "en-US-Journey-F"
-        },
-        "audioConfig": {
-            "audioEncoding": "MP3"
-        }
-    }
-
-    req = urllib.request.Request(
-        endpoint,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"}
-    )
-
-    try:
-        with urllib.request.urlopen(req) as resp:
-            data_bytes = [suspicious link removed]()
-            res_data = json.loads(data_bytes.decode("utf-8"))
-            audio_content = base64.b64decode(res_data["audioContent"])
-            
-            output_path = "public/podcast.mp3"
-            with open(output_path, "wb") as f:
-                f.write(audio_content)
-            print(f"Successfully generated audio at {output_path}")
-
-    except Exception as e:
-        print(f"Failed to generate audio: {e}")
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
+      - name: Generate Audio & Update RSS
+        env:
+          GCP_TTS_API_KEY: ${{ secrets.GCP_TTS_API_KEY }}
+        run: |
+          python -m scripts.generate_audio
