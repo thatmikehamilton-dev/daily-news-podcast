@@ -1,0 +1,40 @@
+name: Daily Podcast Automation
+
+on:
+  schedule:
+    - cron: '30 9 * * *' # Runs every day at 4:30 AM CST (09:30 UTC)
+  workflow_dispatch:      # Allows manual test runs anytime
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install google-cloud-texttospeech boto3
+
+      - name: Generate Audio & Update RSS
+        env:
+          GCP_TTS_API_KEY: ${{ secrets.GCP_TTS_API_KEY }}
+          CLOUDFLARE_R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_R2_ACCOUNT_ID }}
+          CLOUDFLARE_R2_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY }}
+          CLOUDFLARE_R2_SECRET_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_KEY }}
+          PODCAST_DOMAIN: ${{ secrets.PODCAST_DOMAIN }}
+        run: |
+          python scripts/[suspicious link removed]
+
+      - name: Deploy RSS to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: 'daily-news-podcast'
+          directory: 'public'
