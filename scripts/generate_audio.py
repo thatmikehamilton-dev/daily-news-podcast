@@ -12,15 +12,15 @@ def main():
 
     os.makedirs("public", exist_ok=True)
 
-    news_text = """Welcome to today's Daily News Briefing. 
+    news_text = """Welcome to today's Daily News Briefing for October 12th, 2026. I'm your host, bringing you the top stories across economics, entertainment, and the global box office.
 
-In economic news, two American economists, Robert E. Hall and Michael Woodford, have been awarded the Nobel Memorial Prize in Economic Sciences for transforming our understanding of how business expectations and interest rates influence financial stability.
+First up in global economics: two prominent American economists, Robert E. Hall and Michael Woodford, have been awarded the Nobel Memorial Prize in Economic Sciences. The Nobel committee recognized their groundbreaking contributions toward transforming traditional perspectives on managing financial disruptions. Woodford's awarded research specifically sheds light on how businesses make critical pricing decisions by anticipating where central bank interest rates will move down the road. Ultimately, their work demonstrates that a company's financial strategies and long-term stability are deeply shaped by forward-looking expectations regarding costs and competitor pricing.
 
-In entertainment, filmmaker Quentin Tarantino is making his stage writing debut in London's West End with a comedic play titled The Popinjay Cavalier, starring Sacha Baron Cohen. 
+Turning to entertainment and live theater: legendary filmmaker Quentin Tarantino is making his stage writing debut in London's West End. His new comedic play, titled The Popinjay Cavalier, is slated for its official world premiere at the Phoenix Theatre in early 2027. Set in nineteenth-century Europe, the theatrical production draws heavy inspiration from classic adventure cinema. Adding to the excitement, celebrated cinematic comedian Sacha Baron Cohen will star in the production, marking his professional stage debut.
 
-Meanwhile at the weekend box office, the horror feature Other Mommy claimed the top spot globally despite mixed reviews.
+Meanwhile at the weekend box office: Blumhouse Atomic Monster's new horror feature, Other Mommy, claimed the top spot globally despite receiving unfavorable reviews and a low CinemaScore from opening audiences. Produced on a modest budget, the picture pulled in strong ticket sales domestically and internationally, once again proving that the horror genre remains remarkably resilient and profitable even when critical reception falls flat. On the other hand, the drama Social Reckoning struggled to find its footing against stiff competition.
 
-Thank you for listening to today's briefing."""
+That wraps up today's Daily News Briefing. Thank you for tuning in, and stay tuned for our next episode."""
 
     parts = ["texttospeech", "googleapis", "com"]
     host = ".".join(parts)
