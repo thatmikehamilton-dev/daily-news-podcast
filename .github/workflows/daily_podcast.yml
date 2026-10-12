@@ -29,12 +29,11 @@ jobs:
           CLOUDFLARE_R2_SECRET_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_KEY }}
           PODCAST_DOMAIN: ${{ secrets.PODCAST_DOMAIN }}
         run: |
-          python scripts/podcast_builder.py
+          python scripts/[suspicious link removed]
 
       - name: Deploy RSS to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: 'daily-news-podcast'
-          directory: 'public'
+          command: pages deploy public --project-name=daily-news-podcast
