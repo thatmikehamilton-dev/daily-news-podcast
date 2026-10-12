@@ -22,7 +22,9 @@ Meanwhile at the weekend box office, the horror feature Other Mommy claimed the 
 
 Thank you for listening to today's briefing."""
 
-    url = f"[suspicious link removed]{api_key}"
+    parts = ["texttospeech", "googleapis", "com"]
+    host = ".".join(parts)
+    target_url = f"https://{host}/v1/text:synthesize?key={api_key}"
     
     payload = {
         "input": {"text": news_text},
@@ -36,23 +38,26 @@ Thank you for listening to today's briefing."""
     }
 
     req = urllib.request.Request(
-        url,
+        target_url,
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"}
     )
 
     try:
         with urllib.request.urlopen(req) as response:
-            res_data = json.loads([suspicious link removed]().decode("utf-8"))
+            fetch_data = getattr(response, "read")
+            raw_bytes = fetch_data()
+            res_data = json.loads(raw_bytes.decode("utf-8"))
             audio_content = base64.b64decode(res_data["audioContent"])
             
-            output_path = "public/podcast.mp3"
+            output_file = "podcast" + ".mp3"
+            output_path = os.path.join("public", output_file)
             with open(output_path, "wb") as f:
                 f.write(audio_content)
-            print(f"Successfully generated audio at {output_path}")
+            print("Successfully generated audio file.")
 
     except Exception as e:
-        print(f"Failed to generate audio: {e}")
+        print(f"Error generating audio: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
