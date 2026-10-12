@@ -2,8 +2,8 @@ name: Daily Podcast Automation
 
 on:
   schedule:
-    - cron: '30 9 * * *' # Runs every day at 4:30 AM CST (09:30 UTC)
-  workflow_dispatch:      # Allows manual test runs anytime
+    - cron: '30 9 * * *'
+  workflow_dispatch:
 
 jobs:
   build-and-publish:
@@ -29,7 +29,7 @@ jobs:
           CLOUDFLARE_R2_SECRET_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_KEY }}
           PODCAST_DOMAIN: ${{ secrets.PODCAST_DOMAIN }}
         run: |
-          python scripts/[suspicious link removed]
+          python scripts/generate_audio.py
 
       - name: Deploy RSS to Cloudflare Pages
         uses: cloudflare/pages-action@v1
