@@ -1,39 +1,59 @@
-name: Daily Podcast Automation
+import os
+import sys
+import json
+import base64
+import urllib.request
 
-on:
-  schedule:
-    - cron: '30 9 * * *' # Runs every day at 4:30 AM CST (09:30 UTC)
-  workflow_dispatch:      # Allows manual test runs anytime
+def main():
+    api_key = os.environ.get("GCP_TTS_API_KEY")
+    if not api_key:
+        print("Error: GCP_TTS_API_KEY environment variable is not set.")
+        sys.exit(1)
 
-jobs:
-  build-and-publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    os.makedirs("public", exist_ok=True)
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+    news_text = """Welcome to today's Daily News Briefing. 
 
-      - name: Install Dependencies
-        run: |
-          pip install google-cloud-texttospeech boto3
+In economic news, two American economists, Robert E. Hall and Michael Woodford, have been awarded the Nobel Memorial Prize in Economic Sciences for transforming our understanding of how business expectations and interest rates influence financial stability.
 
-      - name: Generate Audio & Update RSS
-        env:
-          GCP_TTS_API_KEY: ${{ secrets.GCP_TTS_API_KEY }}
-          CLOUDFLARE_R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_R2_ACCOUNT_ID }}
-          CLOUDFLARE_R2_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY }}
-          CLOUDFLARE_R2_SECRET_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_KEY }}
-          PODCAST_DOMAIN: ${{ secrets.PODCAST_DOMAIN }}
-        run: |
-          python scripts/[suspicious link removed]
+In entertainment, filmmaker Quentin Tarantino is making his stage writing debut in London's West End with a comedic play titled The Popinjay Cavalier, starring Sacha Baron Cohen. 
 
-      - name: Deploy RSS to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy public --project-name=daily-news-podcast
+Meanwhile at the weekend box office, the horror feature Other Mommy claimed the top spot globally despite mixed reviews.
+
+Thank you for listening to today's briefing."""
+
+    url = f"[suspicious link removed]{api_key}"
+    
+    payload = {
+        "input": {"text": news_text},
+        "voice": {
+            "languageCode": "en-US",
+            "name": "en-US-Journey-F"
+        },
+        "audioConfig": {
+            "audioEncoding": "MP3"
+        }
+    }
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"}
+    )
+
+    try:
+        with urllib.request.urlopen(req) as response:
+            res_data = json.loads([suspicious link removed]().decode("utf-8"))
+            audio_content = base64.b64decode(res_data["audioContent"])
+            
+            output_path = "public/podcast.mp3"
+            with open(output_path, "wb") as f:
+                f.write(audio_content)
+            print(f"Successfully generated audio at {output_path}")
+
+    except Exception as e:
+        print(f"Failed to generate audio: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
