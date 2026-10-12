@@ -26,3 +26,8 @@ jobs:
           GCP_TTS_API_KEY: ${{ secrets.GCP_TTS_API_KEY }}
         run: |
           python -m scripts.generate_audio
+      - name: Save Audio File
+        uses: actions/upload-artifact@v4
+        with:
+          name: podcast-audio
+          path: public/podcast.mp3
