@@ -45,7 +45,7 @@ def ensure_audio_assets():
         else:
             print("Generating broadcast intro chime...")
             intro_path = "tmp_intro.mp3"
-            [suspicious link removed]([
+            subprocess.run([
                 'ffmpeg', '-y', '-f', 'lavfi', '-i',
                 'aevalsrc=0.15*sin(2*PI*523.25*t)*exp(-0.8*t)+0.15*sin(2*PI*659.25*t)*exp(-0.6*t)+0.15*sin(2*PI*783.99*t)*exp(-0.4*t):s=44100:d=3.5',
                 '-af', 'afade=t=out:st=2.5:d=1', intro_path
@@ -57,7 +57,7 @@ def ensure_audio_assets():
         else:
             print("Generating broadcast outro sting...")
             outro_path = "tmp_outro.mp3"
-            [suspicious link removed]([
+            subprocess.run([
                 'ffmpeg', '-y', '-f', 'lavfi', '-i',
                 'aevalsrc=0.15*sin(2*PI*783.99*t)*exp(-0.8*t)+0.15*sin(2*PI*659.25*t)*exp(-0.6*t)+0.15*sin(2*PI*523.25*t)*exp(-0.4*t):s=44100:d=4',
                 '-af', 'afade=t=out:st=3:d=1', outro_path
@@ -133,7 +133,7 @@ That concludes our comprehensive Daily News Briefing for October 12th, 2026. Tha
         '-map', '[out]',
         output_path
     ]
-    [suspicious link removed](concat_cmd, check=True)
+    subprocess.run(concat_cmd, check=True)
 
     # Clean up temporary files
     for tmp in [temp_voice_path, "tmp_intro.mp3", "tmp_outro.mp3"]:
