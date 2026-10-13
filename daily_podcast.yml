@@ -17,24 +17,20 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies
+      - name: Install FFmpeg & Python Dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
           pip install google-cloud-texttospeech boto3
 
-      - name: Generate Audio & Update RSS
+      - name: Generate Audio
         env:
           GCP_TTS_API_KEY: ${{ secrets.GCP_TTS_API_KEY }}
-          CLOUDFLARE_R2_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_R2_ACCOUNT_ID }}
-          CLOUDFLARE_R2_ACCESS_KEY: ${{ secrets.CLOUDFLARE_R2_ACCESS_KEY }}
-          CLOUDFLARE_R2_SECRET_KEY: ${{ secrets.CLOUDFLARE_R2_SECRET_KEY }}
-          PODCAST_DOMAIN: ${{ secrets.PODCAST_DOMAIN }}
         run: |
-          python scripts/generate_audio.py
+          python -m scripts.generate_audio
 
-      - name: Deploy RSS to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+      - name: Save Audio File
+        uses: actions/upload-artifact@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: 'daily-news-podcast'
-          directory: 'public'
+          name: podcast-audio
+          path: public/podcast.mp3
